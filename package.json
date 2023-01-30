@@ -1,0 +1,30 @@
+{
+  "name": "grafana-plugins",
+  "version": "1.0.0",
+  "description": "Raa Labs custom plugins for Grafana",
+  "main": "index.js",
+  "repository": "https://github.com/RaaLabs/grafana-plugins.git",
+  "author": "Raa Labs AS",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "Source/raalabs-action-button-app"
+  ],
+  "scripts": {
+    "server": "docker compose -f Environment/docker-compose.yaml up --build"
+  },
+  "dependencies": {
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.12",
+    "@grafana/create-plugin": "^0.9.0",
+    "@grafana/tsconfig": "^1.2.0-rc1",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@types/react": "^18.0.27",
+    "rollup": "^3.11.0",
+    "rollup-plugin-copy": "^3.4.0",
+    "typescript": "^4.9.4"
+  }
+}

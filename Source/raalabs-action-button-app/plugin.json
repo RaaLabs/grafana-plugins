@@ -1,0 +1,29 @@
+{
+    "id": "raalabs-action-button-app",
+    "type": "app",
+    "name": "Button",
+    "info": {
+        "keywords": [],
+        "description": "",
+        "updated": "%TODAY%",
+        "version": "%VERSION%",
+        "author": {
+            "name": "Raa Labs AS",
+            "url": "raalabs.com"
+        },
+        "logos": {
+            "small": "",
+            "large": ""
+        },
+        "screenshots": [
+
+        ],
+        "links": [
+
+        ]
+    },
+    "dependencies": {
+        "grafanaDependency": "9",
+        "plugins": []
+    }
+}

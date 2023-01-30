@@ -1,0 +1,20 @@
+{
+  "extends": "@grafana/tsconfig",
+
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "declaration": false,
+    "jsx": "react",
+    
+    "resolveJsonModule": true,
+  },
+
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "target": "es5",
+      "esModuleInterop": true,
+    },
+    "transpileOnly": true,
+  },
+}

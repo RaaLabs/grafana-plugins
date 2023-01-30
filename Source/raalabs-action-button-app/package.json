@@ -1,0 +1,16 @@
+{
+  "name": "raalabs-action-button-app",
+  "version": "1.0.0",
+  "description": "Raa Labs Action-Button plugin for Grafana",
+  "main": "index.js",
+  "author": "Raa Labs AS",
+  "license": "MIT",
+  "scripts": {
+    "start": "rollup --config=rollup.config.ts --configPlugin=typescript --watch"
+  },
+  "dependencies": {
+    "@grafana/data": "^8.5.16",
+    "@grafana/runtime": "^8.5.16",
+    "@grafana/ui": "^9.3.6"
+  }
+}

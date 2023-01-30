@@ -1,0 +1,8 @@
+services:
+  grafana:
+    build:
+      context: .
+    ports:
+      - 3000:3000
+    volumes:
+      - ../dist/raalabs-action-button-app:/var/lib/grafana/plugins/raalabs-action-button-app
