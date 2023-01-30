@@ -1,6 +1,7 @@
 import { DataSourcePlugin } from '@grafana/data';
+
+import { ConfigEditor } from './ConfigEditor';
 import { ButtonDatasource } from './datasource';
 
-console.log('DataSource is loading');
-
-export const plugin = new DataSourcePlugin(ButtonDatasource);
+export const plugin = new DataSourcePlugin(ButtonDatasource)
+    .setConfigEditor(ConfigEditor);

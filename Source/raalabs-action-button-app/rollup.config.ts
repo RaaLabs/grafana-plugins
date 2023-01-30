@@ -31,6 +31,7 @@ export default defineConfig({
     ],
     external: [
         '@grafana/data',
+        '@grafana/runtime',
         '@grafana/ui',
         'react',
         'react-dom',

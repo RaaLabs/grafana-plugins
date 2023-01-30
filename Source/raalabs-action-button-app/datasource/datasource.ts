@@ -1,18 +1,9 @@
-import { DataQuery, DataQueryRequest, DataQueryResponse, DataSourceApi, DataSourceInstanceSettings } from "@grafana/data";
-import { Observable } from "rxjs";
+import { DataQuery, DataSourceInstanceSettings } from "@grafana/data";
+import { DataSourceWithBackend } from "@grafana/runtime";
+import { Config } from "./config";
 
-export class ButtonDatasource extends DataSourceApi {
+export class ButtonDatasource extends DataSourceWithBackend<DataQuery, Config> {
     constructor(instanceSettings: DataSourceInstanceSettings) {
         super(instanceSettings);
-        console.log('Constructing datasource');
-    }
-
-    query(request: DataQueryRequest<DataQuery>): Promise<DataQueryResponse> | Observable<DataQueryResponse> {
-        throw new Error("Method not implemented.");
-    }
-
-    async testDatasource(): Promise<any> {
-        console.log('Testing datasource');
-        return true;
     }
 }
