@@ -40,8 +40,8 @@ export const plugin = new PanelPlugin(ButtonPanel)
                         label: 'Success',
                     },
                     {
-                        value: 'desctructive',
-                        label: 'Desctructive',
+                        value: 'destructive',
+                        label: 'Destructive',
                     },
                 ],
                 isClearable: false,

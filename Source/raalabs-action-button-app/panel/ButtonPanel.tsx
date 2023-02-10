@@ -27,7 +27,7 @@ export const ButtonPanel = (props: ButtonPanelProps) => {
         }
 
         const datasource = new ButtonDatasource(settings);
-        datasource.postResource('call', { endpoint: props.options.endpoint });
+        datasource.postResource('call', { endpoint: props.options.endpoint, method: 'GET' });
         // TODO: Handle promise result
     }, [dataSourceSrv, appEvents, props.options.dataSourceId, props.options.endpoint]);
 

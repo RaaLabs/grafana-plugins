@@ -11,7 +11,8 @@
     "Source/raalabs-action-button-app"
   ],
   "scripts": {
-    "server": "docker compose -f Environment/docker-compose.yaml up --build"
+    "server": "docker compose -f Environment/docker-compose.yaml up --build",
+    "server-down": "docker compose -f Environment/docker-compose.yaml down -v"
   },
   "dependencies": {
     "react": "17.0.2",
