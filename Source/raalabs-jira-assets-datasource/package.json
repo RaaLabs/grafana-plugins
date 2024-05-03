@@ -1,0 +1,18 @@
+{
+  "name": "raalabs-jira-assets-datasource",
+  "version": "1.0.0",
+  "description": "Raa Labs Jira Assets plugin for Grafana",
+  "main": "index.js",
+  "author": "Raa Labs AS",
+  "license": "MIT",
+  "scripts": {
+    "start": "rollup --config=rollup.config.ts --configPlugin=typescript --watch",
+    "build": "rollup --config=rollup.config.ts --configPlugin=typescript"
+  },
+  "dependencies": {
+    "@grafana/data": "10.4.2",
+    "@grafana/runtime": "10.4.2",
+    "@grafana/schema": "10.4.2",
+    "@grafana/ui": "10.4.2"
+  }
+}

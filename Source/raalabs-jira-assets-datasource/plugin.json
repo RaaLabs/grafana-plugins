@@ -1,0 +1,37 @@
+{
+    "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
+    "id": "raalabs-jiraassets-datasource",
+    "type": "datasource",
+    "name": "Jira Assets",
+    "info": {
+        "keywords": ["jira", "assets", "datasource" ],
+        "description": "Jira Assets datasource",
+        "updated": "%TODAY%",
+        "version": "%VERSION%",
+        "author": {
+            "name": "Raa Labs AS",
+            "url": "http://raalabs.com"
+        },
+        "logos": {
+            "small": "",
+            "large": ""
+        },
+        "screenshots": [],
+        "links": []
+    },
+    "backend": false,
+    "dependencies": {
+        "grafanaDependency": ">=10.4.2",
+        "plugins": []
+    },
+    "routes": [
+        {
+            "path": "workspace",
+            "url": "https://{{ .JsonData.tenant }}.atlassian.net/rest/servicedeskapi/assets/workspace",
+            "headers": [
+                { "name": "Accept", "value": "application/json" },
+                { "name": "Content-Type", "value": "application/json" }
+            ]
+        }
+    ]
+}

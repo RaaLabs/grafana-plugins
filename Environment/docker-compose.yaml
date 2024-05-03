@@ -4,5 +4,11 @@ services:
       context: .
     ports:
       - 3000:3000
+    environment:
+      NODE_ENV: development
+      #GF_LOG_FILTERS: plugin.raalabs-jiraassets-datasource:debug
+      #GF_LOG_LEVEL: debug
+      GF_DATAPROXY_LOGGING: 1
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: raalabs-jiraassets-datasource
     volumes:
-      - ../dist/raalabs-action-button-app:/var/lib/grafana/plugins/raalabs-action-button-app
+      - ../dist/raalabs-jiraassets-datasource:/var/lib/grafana/plugins/raalabs-jiraassets-datasource

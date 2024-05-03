@@ -5,7 +5,7 @@
     "alwaysStrict": true,
     "declaration": false,
     "jsx": "react",
-    
+    "sourceMap": false,
     "resolveJsonModule": true,
   },
 
