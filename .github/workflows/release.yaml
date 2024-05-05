@@ -1,0 +1,29 @@
+name: Release plugin archives
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  ci:
+    name: Release
+    runs-on: ubuntu-latest
+    env:
+      RELEASE: ${{ github.event_name == 'push' && contains('main,master', github.ref_name) }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - uses: mathieudutour/github-tag-action@v6.2
+      name: Calculate next version and create tag on GitHub
+      id: tag
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        release_branches: 'main,master'
+        dry_run: ${{ env.RELEASE != 'true' }}
+    - name: Install dependencies
+      run: yarn install
+    - name: Build all packages
+      run: yarn workspaces run build
