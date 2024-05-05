@@ -25,5 +25,10 @@ jobs:
         dry_run: ${{ env.RELEASE != 'true' }}
     - name: Install dependencies
       run: yarn install
-    - name: Build all packages
+    - name: Build all plugins
       run: yarn workspaces run build
+    - name: Package all plugins
+      run: |
+        mkdir release && cd dist && for PLUGIN in * ; do
+          zip -r ../release/$PLUGIN-${{ steps.tag.outputs.new_version }}.zip $PLUGIN
+        done
