@@ -26,12 +26,8 @@
     },
     "routes": [
         {
-            "path": "workspace",
-            "url": "https://{{ .JsonData.tenant }}.atlassian.net/rest/servicedeskapi/assets/workspace",
-            "headers": [
-                { "name": "Accept", "value": "application/json" },
-                { "name": "Content-Type", "value": "application/json" }
-            ]
+            "path": "aql",
+            "url": "https://api.atlassian.com/jsm/assets/workspace/{{ .JsonData.workspaceID }}/v1/object/aql"
         }
     ]
 }

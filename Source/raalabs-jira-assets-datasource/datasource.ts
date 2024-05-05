@@ -1,16 +1,14 @@
-import { DataQueryRequest, DataQueryResponse, DataSourceApi, DataSourceInstanceSettings, TestDataSourceResponse } from "@grafana/data";
+import { DataFrame, DataQueryRequest, DataQueryResponse, DataSourceApi, DataSourceInstanceSettings, Field, FieldType, TestDataSourceResponse } from "@grafana/data";
 import { getBackendSrv } from "@grafana/runtime";
 import { DataQuery, DataSourceJsonData } from "@grafana/schema";
-import { Observable, lastValueFrom } from "rxjs";
+import { AssetObject, ObjectAttributeValue, ObjectListInclTypeAttributesEntryResult, ObjectTypeAttribute } from "./types";
 
 export interface AssetsQuery extends DataQuery {
     query: string;
 }
 
 export interface DataSourceOptions extends DataSourceJsonData {
-    tenant?: string;
-    basicAuth?: boolean;
-    basicAuthUser?: string;
+    workspaceID?: string;
 }
 
 export interface SecureDataSourceOptions {
@@ -22,25 +20,133 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
 
     constructor(config: DataSourceInstanceSettings<DataSourceOptions>) {
         super(config);
-        console.log('constructor');
         this.url = config.url;
     }
 
-    query(request: DataQueryRequest<AssetsQuery>): Promise<DataQueryResponse> | Observable<DataQueryResponse> {
-        throw new Error("Method not implemented.");
+    async query(request: DataQueryRequest<AssetsQuery>): Promise<DataQueryResponse> {
+        const response: DataQueryResponse = { data: [] };
+        for (const target of request.targets) {
+            const aql = target.query;
+            const result = await this.assetQuery(aql);
+            response.data.push(result);
+        }
+        return response;
     }
 
     async testDatasource(): Promise<TestDataSourceResponse> {
-        const response = getBackendSrv().fetch({
-            method: 'GET',
-            url: `${this.url}/workspace`,
-        });
-        console.log(await lastValueFrom(response));
-
-        return {
-            status: 'success',
-            message: 'Data source is working',
-        };
+        const result = await this.assetQuery('', false);
+        if ('values' in result && 'total' in result) {
+            return {
+                status: 'success',
+                message: `Discovered ${result.total} assets in workspace`,
+            };
+        } else {
+            return {
+                status: 'error',
+                message: 'Failed to connect to Jira Assets API',
+            };
+        }
     }
 
+    private async assetQuery(aql: string, all: boolean = true): Promise<DataFrame> {
+        const attributes: ObjectTypeAttribute[] = [];
+        const objects: AssetObject[] = [];
+
+        let isLast = false;
+        while (!isLast) {
+            const response = await getBackendSrv()
+                .post<ObjectListInclTypeAttributesEntryResult>(
+                    `${this.url}/aql?startAt=${objects.length}&maxResults=100&includeAttributes=true`,
+                    { qlQuery: aql },
+                );
+
+            attributes.push(...response.objectTypeAttributes);
+            objects.push(...response.values);
+
+            isLast = response.isLast;
+        }
+
+        const fields: Field[] = [], mapped = new Set<string>();
+        for (const attribute of attributes) {
+            if (mapped.has(attribute.id)) continue;
+            mapped.add(attribute.id);
+
+            const field = {
+                name: attribute.name,
+                type: DataSource.jiraTypeToGrafanaType(attribute),
+                config: {},
+            };
+            const values = objects.map(({ attributes }) => {
+                for (const { objectTypeAttributeId, objectAttributeValues } of attributes) {
+                    if (objectTypeAttributeId !== attribute.id) continue;
+
+                    if (attribute.maximumCardinality > 1) {
+                        return objectAttributeValues.map(v => DataSource.jiraValueToGrafanaValue(v, field.type));
+                    }
+
+                    if (objectAttributeValues.length > 0) {
+                        return DataSource.jiraValueToGrafanaValue(objectAttributeValues[0], field.type);
+                    }
+
+                    break;
+                }
+                return null;
+            });
+
+            if (attribute.maximumCardinality > 1) {
+                field.type = FieldType.other;
+            }
+
+            fields.push({ ...field, values });
+        }
+
+        return { fields, length: objects.length };
+    }
+
+    private static jiraValueToGrafanaValue(value: ObjectAttributeValue, type: FieldType): any {
+        switch (type) {
+            case FieldType.string:
+            case FieldType.other:
+                return value.displayValue;
+            case FieldType.number:
+                console.log('number', value);
+                return value.value;
+            case FieldType.boolean:
+                console.log('boolean', value);
+                return value.value === 'true';
+            case FieldType.time:
+                return value.value;
+        }
+    }
+
+    private static jiraTypeToGrafanaType(attribute: ObjectTypeAttribute): FieldType {
+        switch (attribute.type) {
+            case 0: // Default
+                switch (attribute.defaultType.id) {
+                    case 0: // Text
+                    case 7: // Url
+                    case 8: // Email
+                    case 9: // Textarea
+                    case 8: // Select
+                    case 11: // IP Address
+                        return FieldType.string;
+                    case 1: // Integer
+                    case 3: // Double
+                        return FieldType.number;
+                    case 2: // Boolean
+                        return FieldType.boolean;
+                    case 4: // Date
+                    case 5: // Time
+                    case 6: // DateTime
+                        return FieldType.time;
+                }
+                return FieldType.other;
+            case 1: // Object reference
+            case 2: // User
+            case 4: // Group
+            case 7: // Status
+                return FieldType.other;
+        }
+        return FieldType.other;
+    }
 }
