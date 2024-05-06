@@ -28,17 +28,17 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
         for (const target of request.targets) {
             const aql = target.query;
             const result = await this.assetQuery(aql);
-            response.data.push(result);
+            response.data.push({ ...result, refId: target.refId });
         }
         return response;
     }
 
     async testDatasource(): Promise<TestDataSourceResponse> {
         const result = await this.assetQuery('', false);
-        if ('values' in result && 'total' in result) {
+        if (result.length > 0 && result.meta?.custom?.total > 0) {
             return {
                 status: 'success',
-                message: `Discovered ${result.total} assets in workspace`,
+                message: `Discovered ${result.meta?.custom?.total} assets in workspace`,
             };
         } else {
             return {
@@ -52,9 +52,9 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
         const attributes: ObjectTypeAttribute[] = [];
         const objects: AssetObject[] = [];
 
-        let isLast = false;
-        while (!isLast) {
-            const response = await getBackendSrv()
+        let response : ObjectListInclTypeAttributesEntryResult | undefined;
+        while (response === undefined || (all && !response.isLast)) {
+            response = await getBackendSrv()
                 .post<ObjectListInclTypeAttributesEntryResult>(
                     `${this.url}/aql?startAt=${objects.length}&maxResults=100&includeAttributes=true`,
                     { qlQuery: aql },
@@ -62,8 +62,6 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
 
             attributes.push(...response.objectTypeAttributes);
             objects.push(...response.values);
-
-            isLast = response.isLast;
         }
 
         const fields: Field[] = [], mapped = new Set<string>();
@@ -100,7 +98,7 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
             fields.push({ ...field, values });
         }
 
-        return { fields, length: objects.length };
+        return { fields, length: objects.length, meta: { custom: { total: response?.total }}};
     }
 
     private static jiraValueToGrafanaValue(value: ObjectAttributeValue, type: FieldType): any {
@@ -109,11 +107,9 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
             case FieldType.other:
                 return value.displayValue;
             case FieldType.number:
-                console.log('number', value);
-                return value.value;
+                return parseFloat(value.value);
             case FieldType.boolean:
-                console.log('boolean', value);
-                return value.value === 'true';
+                return !!value.value;
             case FieldType.time:
                 return value.value;
         }
