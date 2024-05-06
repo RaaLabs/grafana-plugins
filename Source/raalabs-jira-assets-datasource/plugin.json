@@ -20,6 +20,9 @@
         "links": []
     },
     "backend": false,
+    "annotations": true,
+    "metrics": true,
+    "logs": true,
     "dependencies": {
         "grafanaDependency": ">=10.4.2",
         "plugins": []
