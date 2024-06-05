@@ -1,5 +1,5 @@
 import { DataFrame, DataQueryRequest, DataQueryResponse, DataSourceApi, DataSourceInstanceSettings, Field, FieldType, TestDataSourceResponse } from "@grafana/data";
-import { getBackendSrv } from "@grafana/runtime";
+import { getBackendSrv, getTemplateSrv } from "@grafana/runtime";
 import { DataQuery, DataSourceJsonData } from "@grafana/schema";
 import { AssetObject, ObjectAttributeValue, ObjectListInclTypeAttributesEntryResult, ObjectTypeAttribute } from "./types";
 
@@ -26,7 +26,7 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
     async query(request: DataQueryRequest<AssetsQuery>): Promise<DataQueryResponse> {
         const response: DataQueryResponse = { data: [] };
         for (const target of request.targets) {
-            const aql = target.query;
+            const aql = getTemplateSrv().replace(target.query, request.scopedVars);
             const result = await this.assetQuery(aql);
             response.data.push({ ...result, refId: target.refId });
         }
