@@ -48,6 +48,8 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
         }
     }
 
+    async metricFindQuery(query: string, options?: any)
+
     private async assetQuery(aql: string, all: boolean = true): Promise<DataFrame> {
         const attributes: ObjectTypeAttribute[] = [];
         const objects: AssetObject[] = [];
