@@ -1,4 +1,4 @@
-import { DataFrame, DataQueryRequest, DataQueryResponse, DataSourceApi, DataSourceInstanceSettings, Field, FieldType, TestDataSourceResponse } from "@grafana/data";
+import { DataFrame, DataQueryRequest, DataQueryResponse, DataSourceApi, DataSourceInstanceSettings, Field, FieldType, TestDataSourceResponse, MetricFindValue } from "@grafana/data";
 import { getBackendSrv, getTemplateSrv } from "@grafana/runtime";
 import { DataQuery, DataSourceJsonData } from "@grafana/schema";
 import { AssetObject, ObjectAttributeValue, ObjectListInclTypeAttributesEntryResult, ObjectTypeAttribute } from "./types";
@@ -47,8 +47,6 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
             };
         }
     }
-
-    async metricFindQuery(query: string, options?: any)
 
     private async assetQuery(aql: string, all: boolean = true): Promise<DataFrame> {
         const attributes: ObjectTypeAttribute[] = [];
@@ -146,5 +144,20 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
                 return FieldType.other;
         }
         return FieldType.other;
+    }
+
+    async metricFindQuery(query: string, options?: any): Promise<MetricFindValue[]> {
+        // Retrieve DataQueryResponse based on query.
+        const aql = getTemplateSrv().replace(query, options.scopedVars);
+        const result = await this.assetQuery(aql, false);
+        // console.log(result.fields[0].values)
+        let retVal : MetricFindValue[] = []
+        if (result !== undefined && result.fields.length > 0) {
+            // Only return keys
+            for (const value of result.fields[0].values) {
+                retVal.push({text: value});
+            }
+        }
+        return retVal;
     }
 }
