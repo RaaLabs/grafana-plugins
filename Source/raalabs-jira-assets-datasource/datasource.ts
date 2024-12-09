@@ -150,12 +150,13 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
         // Retrieve DataQueryResponse based on query.
         const aql = getTemplateSrv().replace(query, options.scopedVars);
         const result = await this.assetQuery(aql, false);
-        // console.log(result.fields[0].values)
+        // console.log(result)
         let retVal : MetricFindValue[] = []
         if (result !== undefined && result.fields.length > 0) {
-            // Only return keys
-            for (const value of result.fields[0].values) {
-                retVal.push({text: value});
+            for (const field of result.fields) {
+                for (const value of field.values) {
+                    retVal.push({text: value});
+                }
             }
         }
         return retVal;
