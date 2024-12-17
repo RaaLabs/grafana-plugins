@@ -56,7 +56,7 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
         while (response === undefined || (all && !response.isLast)) {
             response = await getBackendSrv()
                 .post<ObjectListInclTypeAttributesEntryResult>(
-                    `${this.url}/aql?startAt=${objects.length}&maxResults=100&includeAttributes=true`,
+                    `${this.url}/aql?startAt=${objects.length}&maxResults=500&includeAttributes=true`,
                     { qlQuery: aql },
                 );
 
