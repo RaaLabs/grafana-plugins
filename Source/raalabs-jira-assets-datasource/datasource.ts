@@ -7,6 +7,11 @@ export interface AssetsQuery extends DataQuery {
     query: string;
 }
 
+export interface MyVariableQuery {
+    rawQuery: string;
+    field: string;
+}
+
 export interface DataSourceOptions extends DataSourceJsonData {
     workspaceID?: string;
 }
@@ -146,15 +151,20 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
         return FieldType.other;
     }
 
-    async metricFindQuery(query: string, options?: any): Promise<MetricFindValue[]> {
+    async metricFindQuery(query: MyVariableQuery, options?: any): Promise<MetricFindValue[]> {
         // Retrieve DataQueryResponse based on query.
-        const aql = getTemplateSrv().replace(query, options.scopedVars);
+        const aql = getTemplateSrv().replace(query.rawQuery, options.scopedVars);
         const result = await this.assetQuery(aql, false);
-        // console.log(result.fields[0].values)
+        const column_name = query.field;
+        for (var i = 0; i < result.fields.length; i++) {
+            if (result.fields[i].name == column_name) {
+                break;
+            }
+        }
         let retVal : MetricFindValue[] = []
         if (result !== undefined && result.fields.length > 0) {
-            // Only return keys
-            for (const value of result.fields[0].values) {
+            // Return values for selected field
+            for (const value of result.fields[i].values) {
                 retVal.push({text: value});
             }
         }

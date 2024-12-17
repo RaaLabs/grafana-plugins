@@ -158,3 +158,8 @@ export type Status = {
     category: number;
     objectSchemaId: string;
 };
+
+export type MyVariableQuery = {
+    rawQuery: string;
+    field: string;
+};
