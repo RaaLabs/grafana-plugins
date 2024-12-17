@@ -11,7 +11,7 @@
     "Source/raalabs-jira-assets-datasource"
   ],
   "scripts": {
-    "server": "docker compose -f Environment/docker-compose.yaml up --build",
+    "server": "docker compose -f Environment/docker-compose.yaml build --no-cache && docker compose -f Environment/docker-compose.yaml up",
     "server-down": "docker compose -f Environment/docker-compose.yaml down -v"
   },
   "dependencies": {
