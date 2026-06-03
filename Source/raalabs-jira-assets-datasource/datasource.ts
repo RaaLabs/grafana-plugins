@@ -163,9 +163,16 @@ export class DataSource extends DataSourceApi<AssetsQuery, DataSourceOptions> {
         }
         let retVal : MetricFindValue[] = []
         if (result !== undefined && result.fields.length > 0) {
-            // Return values for selected field
             for (const value of result.fields[i].values) {
-                retVal.push({text: value});
+                if (Array.isArray(value)) {
+                    for (const item of value) {
+                        if (item != null) {
+                            retVal.push({ text: String(item) });
+                        }
+                    }
+                } else if (value != null) {
+                    retVal.push({ text: String(value) });
+                }
             }
         }
         return retVal;
